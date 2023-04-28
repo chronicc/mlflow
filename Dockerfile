@@ -13,23 +13,23 @@ RUN ln -s /usr/bin/dpkg-split /usr/sbin/dpkg-split \
 # Install build-essential to compile extensions.
 RUN apt-get update && \
     apt-get install -y \
-      make \
-      build-essential \
-      libssl-dev \
-      zlib1g-dev \
-      libbz2-dev \
-      libreadline-dev \
-      libsqlite3-dev \
-      wget \
-      curl \
-      llvm-9 \
-      libncursesw5-dev \
-      xz-utils \
-      tk-dev \
-      libxml2-dev \
-      libxmlsec1-dev \
-      libffi-dev \
-      liblzma-dev && \
+    make \
+    build-essential \
+    libssl-dev \
+    zlib1g-dev \
+    libbz2-dev \
+    libreadline-dev \
+    libsqlite3-dev \
+    wget \
+    curl \
+    llvm-9 \
+    libncursesw5-dev \
+    xz-utils \
+    tk-dev \
+    libxml2-dev \
+    libxmlsec1-dev \
+    libffi-dev \
+    liblzma-dev && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN ln -s /usr/bin/llvm-config-9 /usr/bin/llvm-config
@@ -37,7 +37,10 @@ RUN ln -s /usr/bin/llvm-config-9 /usr/bin/llvm-config
 RUN python -m pip install --upgrade pip
 
 RUN pip install poetry wheel &&  \
-    poetry install --no-root --no-dev
+    poetry install --no-root --only main
+
+COPY patches /mlflow/patches
+RUN patch -d .venv/lib/python3.9/site-packages/ -p1 < patches/chunk_configuration.patch
 
 FROM python:3.9.16-slim
 
